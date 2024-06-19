@@ -1,25 +1,29 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/Blxssy/Todo-app/backend/internal/controller"
 	httphandler "github.com/Blxssy/Todo-app/backend/internal/handler/http"
 	"github.com/Blxssy/Todo-app/backend/internal/model/memory"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 func main() {
+	staticDir := "./frontend/static"
+
 	router := mux.NewRouter()
 
-	//router.PathPrefix("/static/").Handler(http.StripPrefix("/static/",))
-	//router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	// router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(staticDir))))
 
 	repo := memory.New()
 	ctrl := controller.New(repo)
 	h := httphandler.New(ctrl)
 
-	router.HandleFunc("/", h.Home).Methods("GET")
-	router.HandleFunc("/todo", h.CreateTodo).Methods("POST")
+	router.HandleFunc("/todos", h.Home).Methods("GET")
+	router.HandleFunc("/todos", h.CreateTodo).Methods("POST")
+	router.HandleFunc("/todos/{id}/complete", h.CompleteTodo).Methods("PUT")
+	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(staticDir))))
 
 	http.ListenAndServe(":8080", router)
 }

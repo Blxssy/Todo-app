@@ -1,9 +1,10 @@
 package memory
 
 import (
+	"sync"
+
 	"github.com/Blxssy/Todo-app/backend"
 	"github.com/Blxssy/Todo-app/backend/internal/model"
-	"sync"
 )
 
 type Repository struct {
@@ -22,7 +23,7 @@ func (r *Repository) Put(title string) error {
 	var todo backend.Todo
 	todo.ID = len(r.data)
 	todo.Title = title
-	todo.State = true
+	todo.State = false
 
 	r.data[todo.ID] = todo
 
