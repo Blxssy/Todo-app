@@ -14,8 +14,6 @@ func main() {
 
 	router := mux.NewRouter()
 
-	// router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(staticDir))))
-
 	repo := memory.New()
 	ctrl := controller.New(repo)
 	h := httphandler.New(ctrl)
