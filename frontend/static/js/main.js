@@ -24,44 +24,67 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify({ title })
         })
-        .then(response => response.json())
-        .then(newTodo => {
-            const listItem = createTodoListItem(newTodo);
-            todoList.appendChild(listItem);
-            todoTitle.value = '';
-        })
-        .catch(error => console.error('Error adding todo:', error));
+            .then(response => response.json())
+            .then(newTodo => {
+                const listItem = createTodoListItem(newTodo);
+                todoList.appendChild(listItem);
+                todoTitle.value = '';
+            })
+            .catch(error => console.error('Error adding todo:', error));
     };
 
     const completeTodo = (id) => {
         fetch(`/todos/${id}/complete`, {
             method: 'PUT'
         })
-        .then(response => response.json())
-        .then(updatedTodo => {
-            const listItem = document.getElementById(`todo-${updatedTodo.id}`);
-            if (listItem) {
-                listItem.classList.add('completed');
-            }
-        })
-        .catch(error => console.error('Error completing todo:', error));
+            .then(response => response.json())
+            .then(updatedTodo => {
+                const listItem = document.getElementById(`todo-${updatedTodo.id}`);
+                if (listItem) {
+                    listItem.classList.add('completed');
+                }
+            })
+            .catch(error => console.error('Error completing todo:', error));
     };
+
+    const deleteTodo = (id) => {
+        fetch(`/todos/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    const listItem = document.getElementById(`todo-${id}`);
+                    if (listItem) {
+                        listItem.remove();
+                    }
+                } else {
+                    console.error('Failed to delete todo');
+                }
+            })
+            .catch(error => console.error('Error deleting todo:', error));
+    };
+
 
     const createTodoListItem = (todo) => {
         const listItem = document.createElement('li');
         listItem.id = `todo-${todo.id}`;
         listItem.textContent = todo.title;
+
         if (todo.state) {
             listItem.classList.add('completed');
         }
 
-        const completeButton = document.createElement('button');
-        completeButton.textContent = 'Complete';
-        completeButton.addEventListener('click', () => completeTodo(todo.id));
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+            deleteTodo(todo.id);
+        });
 
-        listItem.appendChild(completeButton);
+        listItem.appendChild(deleteButton);
+
         return listItem;
     };
+
 
     todoForm.addEventListener('submit', (e) => {
         e.preventDefault();

@@ -61,3 +61,26 @@ func (h *Handler) CompleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Error(w, "Todo not found", http.StatusNotFound)
 }
+
+func (h *Handler) HandleDeleteTodo(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	idStr, ok := vars["id"]
+	if !ok {
+		http.Error(w, "Missing todo ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid todo ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.ctrl.Repo.Delete(id)
+	if err != nil {
+		http.Error(w, "Failed to delete todo", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
